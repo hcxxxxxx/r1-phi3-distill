@@ -20,14 +20,14 @@ chat_pipeline = pipeline(
 
 # Generate response
 prompt = """<|user|>
-List all the non-empty subsets of {1, 2, 3}
+What's the number of non-empty subsets of {-1, 0, 1, 2}?
 <|end|>
 <|assistant|>
 """
 
 output = chat_pipeline(
     prompt,
-    max_new_tokens=5000,
+    max_new_tokens=500,
     temperature=0.7,
     do_sample=True,
     eos_token_id=tokenizer.eos_token_id

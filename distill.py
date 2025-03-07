@@ -17,7 +17,7 @@ train_ds = split_dataset["train"]
 test_ds = split_dataset["test"]
 
 # training scale on the dataset
-scale = 0.02
+scale = 0.01
 train_ds = train_ds.select(range(int(len(train_ds) * scale)))
 test_ds = test_ds.select(range(int(len(test_ds) * scale)))
 
@@ -80,6 +80,7 @@ model = AutoModelForCausalLM.from_pretrained(
     cache_dir="./Hcx"
 )
 model.resize_token_embeddings(len(tokenizer))  # Resize for custom tokens
+#model = torch.nn.DataParallel(model)
 
 from peft import LoraConfig
 
@@ -102,6 +103,10 @@ training_args = TrainingArguments(
     gradient_accumulation_steps=4,
     eval_strategy="epoch",
     save_strategy="epoch",
+    load_best_model_at_end=True,                    # 训练结束时加载最佳模型
+    metric_for_best_model="eval_loss",              # 根据验证损失选择最佳模型
+    greater_is_better=False,                        # 损失越小越好
+    save_total_limit=1,                             # 最多保存 1 个模型，保存最好的模型
     logging_strategy="steps",
     logging_steps=50,
     learning_rate=2e-5,
@@ -114,6 +119,9 @@ training_args = TrainingArguments(
 )
 
 num_training_steps = (len(train_dataset) // 32) * 3
+#num_training_steps = (len(train_dataset) // training_args.per_device_train_batch_size) * training_args.num_train_epochs
+print(num_training_steps)
+#print(training_args.max_steps)
 
 from trl import SFTTrainer
 from transformers import DataCollatorForLanguageModeling
@@ -132,7 +140,8 @@ lr_scheduler = get_scheduler(
     name="cosine",
     optimizer=optimizer,
     num_warmup_steps=0,
-    num_training_steps=training_args.max_steps
+#    num_training_steps=training_args.max_steps
+    num_training_steps=num_training_steps
 )
 
 # Trainer
