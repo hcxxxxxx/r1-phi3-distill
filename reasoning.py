@@ -20,7 +20,7 @@ chat_pipeline = pipeline(
 
 # Generate response
 prompt = """<|user|>
-What's the probability of rolling a 12 with two dice?
+List all the non-empty subsets of {1, 2, 3}
 <|end|>
 <|assistant|>
 """

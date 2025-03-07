@@ -7,8 +7,8 @@ os.environ["NCCL_IB_DISABLE"] = "1"
 from datasets import load_dataset
 # Load the dataset
 dataset = load_dataset("Magpie-Align/Magpie-Reasoning-V2-250K-CoT-Deepseek-R1-Llama-70B", split="train", token="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", cache_dir="./Hcx")
+#dataset = load_dataset("Magpie-Align/Magpie-Reasoning-V1-150K-CoT-Deepseek-R1-Llama-70B", split="train", token="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", cache_dir="./Hcx")
 
-#dataset = dataset["train"]
 # Split dataset into 90% train, 10% test
 split_dataset = dataset.train_test_split(test_size=0.1, seed=42)
 
@@ -16,19 +16,14 @@ split_dataset = dataset.train_test_split(test_size=0.1, seed=42)
 train_ds = split_dataset["train"]
 test_ds = split_dataset["test"]
 
-###
-train_ds = train_ds.select(range(int(len(train_ds) * 0.01)))
-test_ds = test_ds.select(range(int(len(test_ds) * 0.01)))
-###
+# training scale on the dataset
+scale = 0.02
+train_ds = train_ds.select(range(int(len(train_ds) * scale)))
+test_ds = test_ds.select(range(int(len(test_ds) * scale)))
 
 # Print sizes
 print(f"Train size: {len(train_ds)}")
 print(f"Test size: {len(test_ds)}")
-# Format the dataset
-#def format_instruction(example):   
-#    return { "text": (            "<|user|>\n"            f"{example['instruction']}\n"            "<|end|>\n"            "<|assistant|>\n"            f"{example['response']}\n"            "<|end|>"        )    }
-#formatted_dataset = dataset.map(format_instruction, batched=False, remove_columns=dataset.column_names)
-#formatted_dataset = formatted_dataset.train_test_split(test_size=0.1)  # 90-10 train-test split
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
@@ -41,7 +36,7 @@ CUSTOM_TOKENS = ["<think>", "</think>"]
 tokenizer.add_special_tokens({"additional_special_tokens": CUSTOM_TOKENS})
 tokenizer.pad_token = tokenizer.eos_token
 
-###
+# Formatting dataset
 def format(ex):
     system_message=f"""
     You are a master at {ex['task_category']}. Based on the question asked, answer the question to the best of your abilities
@@ -70,11 +65,9 @@ train_dataset=train_ds.remove_columns(['instruction', 'conversations', 'gen_inpu
 
 split_dataset = train_dataset.train_test_split(test_size=0.1, seed=50)
 
-instruction_template = "<｜User｜>"
-response_template = "<｜Assistant｜>"
+instruction_template = "<|User|>"
+response_template = "<|Assistant|>"
 collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template,response_template=response_template, tokenizer=tokenizer)
-
-###
 
 # Load model with flash attention
 model = AutoModelForCausalLM.from_pretrained(
@@ -131,12 +124,12 @@ data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
 from transformers import AdamW, get_scheduler
 
-# 创建 AdamW 优化器
+# AdamW optimizer
 optimizer = AdamW(model.parameters(), lr=training_args.learning_rate)
 
-# 创建学习率调度器（例如线性调度器）
+# LR scheduler
 lr_scheduler = get_scheduler(
-    name="cosine",  # 可以选择其他类型的调度器
+    name="cosine",
     optimizer=optimizer,
     num_warmup_steps=0,
     num_training_steps=training_args.max_steps
@@ -148,23 +141,13 @@ trainer = SFTTrainer(
     args=training_args,
     train_dataset=split_dataset['train'],
     eval_dataset=split_dataset['test'],
-    data_collator=collator,  # Your custom data collator
     tokenizer=tokenizer,
     dataset_text_field="query",
-    optimizers=(optimizer, lr_scheduler)
-#    train_dataset=formatted_dataset["train"],
-#    eval_dataset=formatted_dataset["test"],
-#    data_collator=data_collator,
-#    packing=True
+    optimizers=(optimizer, lr_scheduler),
+    data_collator=data_collator,
     )
 
 # Start training
 trainer.train()
 trainer.save_model("./phi-3-deepseek-finetuned")
 tokenizer.save_pretrained("./phi-3-deepseek-finetuned")
-
-
-#final_model = trainer.model.merge_and_unload()
-#final_model.save_pretrained("./phi-3-deepseek-finetuned-final")
-#tokenizer.save_pretrained("./phi-3-deepseek-finetuned-final")
-
