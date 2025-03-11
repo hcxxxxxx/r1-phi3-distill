@@ -7,7 +7,6 @@ os.environ["NCCL_IB_DISABLE"] = "1"
 from datasets import load_dataset
 # Load the dataset
 dataset = load_dataset("Magpie-Align/Magpie-Reasoning-V2-250K-CoT-Deepseek-R1-Llama-70B", split="train", token="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", cache_dir="./Hcx")
-#dataset = load_dataset("Magpie-Align/Magpie-Reasoning-V1-150K-CoT-Deepseek-R1-Llama-70B", split="train", token="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", cache_dir="./Hcx")
 
 # Split dataset into 90% train, 10% test
 split_dataset = dataset.train_test_split(test_size=0.1, seed=42)
@@ -17,7 +16,7 @@ train_ds = split_dataset["train"]
 test_ds = split_dataset["test"]
 
 # training scale on the dataset
-scale = 0.02
+scale = 0.03
 train_ds = train_ds.select(range(int(len(train_ds) * scale)))
 test_ds = test_ds.select(range(int(len(test_ds) * scale)))
 
@@ -34,7 +33,10 @@ tokenizer = AutoTokenizer.from_pretrained(model_id, trust_remote_code=True, cach
 # Add custom tokens
 CUSTOM_TOKENS = ["<think>", "</think>"]
 tokenizer.add_special_tokens({"additional_special_tokens": CUSTOM_TOKENS})
-tokenizer.pad_token = tokenizer.eos_token
+tokenizer.add_special_tokens({"pad_token": "[PAD]"})
+tokenizer.pad_token_id = tokenizer.convert_tokens_to_ids("[PAD]")
+print(f"PAD token ID: {tokenizer.pad_token_id}")
+print(f"EOS token ID: {tokenizer.eos_token_id}")
 
 # Formatting dataset
 def format(ex):
@@ -59,14 +61,15 @@ def format(ex):
 from trl import DataCollatorForCompletionOnlyLM    
 
 train_ds=train_ds.map(format)
+train_ds=train_ds.remove_columns(['instruction', 'conversations', 'gen_input_configs', 'gen_response_configs', 'intent', 'knowledge', 'difficulty', 'difficulty_generator', 'input_quality', 'quality_explanation', 'quality_generator', 'task_category', 'other_task_category', 'task_category_generator', 'language', 'full'])
 
+#split_dataset = train_dataset.train_test_split(test_size=0.1, seed=50)
 
-train_dataset=train_ds.remove_columns(['instruction', 'conversations', 'gen_input_configs', 'gen_response_configs', 'intent', 'knowledge', 'difficulty', 'difficulty_generator', 'input_quality', 'quality_explanation', 'quality_generator', 'task_category', 'other_task_category', 'task_category_generator', 'language', 'full'])
+test_ds=test_ds.map(format)
+test_ds=test_ds.remove_columns(['instruction', 'conversations', 'gen_input_configs', 'gen_response_configs', 'intent', 'knowledge', 'difficulty', 'difficulty_generator', 'input_quality', 'quality_explanation', 'quality_generator', 'task_category', 'other_task_category', 'task_category_generator', 'language', 'full'])
 
-split_dataset = train_dataset.train_test_split(test_size=0.1, seed=50)
-
-instruction_template = "<|User|>"
-response_template = "<|Assistant|>"
+instruction_template = "<|user|>"
+response_template = "<|assistant|>"
 collator = DataCollatorForCompletionOnlyLM(instruction_template=instruction_template,response_template=response_template, tokenizer=tokenizer)
 
 # Load model with flash attention
@@ -75,7 +78,7 @@ model = AutoModelForCausalLM.from_pretrained(
     load_in_8bit=False,
     trust_remote_code=True,
     device_map="auto",
-    torch_dtype=torch.float16,
+    torch_dtype=torch.bfloat16,
     attn_implementation="flash_attention_2",
     cache_dir="./Hcx"
 )
@@ -96,7 +99,7 @@ from transformers import TrainingArguments
 
 training_args = TrainingArguments(
     output_dir="./phi-3-deepseek-finetuned",
-    num_train_epochs=3,
+    num_train_epochs=1,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     gradient_accumulation_steps=4,
@@ -104,16 +107,18 @@ training_args = TrainingArguments(
     save_strategy="epoch",
     logging_strategy="steps",
     logging_steps=50,
-    learning_rate=2e-5,
+    learning_rate=1e-4,
 #    fp16=True,
-    fp16=False,
-    optim="paged_adamw_32bit",
+#    fp16=False,
+    fp16 = not torch.cuda.is_bf16_supported(),
+    bf16 = torch.cuda.is_bf16_supported(),
+    optim="adamw_torch",
     max_grad_norm=0.3,
-    warmup_ratio=0.03,
-    lr_scheduler_type="cosine",
+    warmup_ratio=0.1,
+    lr_scheduler_type="linear",
 )
 
-num_training_steps = (len(train_dataset) // 32) * 3
+# num_training_steps = (len(train_dataset) // 32) * 3
 
 from trl import SFTTrainer
 from transformers import DataCollatorForLanguageModeling
@@ -122,29 +127,32 @@ from transformers import DataCollatorForLanguageModeling
 data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
 
 
-from transformers import AdamW, get_scheduler
+# from transformers import AdamW, get_scheduler
 
 # AdamW optimizer
-optimizer = AdamW(model.parameters(), lr=training_args.learning_rate)
+# optimizer = AdamW(model.parameters(), lr=training_args.learning_rate)
 
 # LR scheduler
-lr_scheduler = get_scheduler(
-    name="cosine",
-    optimizer=optimizer,
-    num_warmup_steps=0,
-    num_training_steps=training_args.max_steps
-)
+# lr_scheduler = get_scheduler(
+#     name="cosine",
+#     optimizer=optimizer,
+#     num_warmup_steps=0,
+#     num_training_steps=training_args.max_steps
+# )
 
 # Trainer
 trainer = SFTTrainer(
     model=model,
     args=training_args,
-    train_dataset=split_dataset['train'],
-    eval_dataset=split_dataset['test'],
+    # train_dataset=split_dataset['train'],
+    # eval_dataset=split_dataset['test'],
+    train_dataset=train_ds,
+    eval_dataset=test_ds,
     tokenizer=tokenizer,
     dataset_text_field="query",
-    optimizers=(optimizer, lr_scheduler),
+    # optimizers=(optimizer, lr_scheduler),
     data_collator=data_collator,
+    max_seq_length=2048
     )
 
 # Start training

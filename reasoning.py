@@ -20,7 +20,7 @@ chat_pipeline = pipeline(
 
 # Generate response
 prompt = """<|user|>
-List all the non-empty subsets of {1, 2, 3}
+List all the subsets of {1, 2, 3}
 <|end|>
 <|assistant|>
 """
