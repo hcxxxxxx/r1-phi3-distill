@@ -6,3 +6,5 @@ per_device_eval_batch_size=8
 gradient_accumulation_steps=4
 logging_steps=50
 learning_rate=1e-4
+
+lr_scheduler_type="linear"
