@@ -21,7 +21,7 @@ for entry in log_history:
         learning_rates.append(entry.get("learning_rate", None))
         grad_norms.append(entry.get("grad_norm", None))
 
-log_dir = "./log1"
+log_dir = "./log2"
 os.makedirs(log_dir, exist_ok=True)
 
 line_width = 1
@@ -56,5 +56,6 @@ plt.legend()
 plt.grid()
 plt.savefig(os.path.join(log_dir, "grad_norm_curve.png"))
 plt.close()
+
 
 print(f"所有图像已保存到 {log_dir}")
