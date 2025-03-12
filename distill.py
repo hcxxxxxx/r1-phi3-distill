@@ -93,9 +93,9 @@ from bitsandbytes import research, utils
 from peft import LoraConfig
 
 peft_config = LoraConfig(
-    r=8,  # Rank of the low-rank matrices
-    lora_alpha=16,  # Scaling factor
-    lora_dropout=0.2,  # Dropout rate
+    r=4,  # Rank of the low-rank matrices
+    lora_alpha=8,  # Scaling factor
+    lora_dropout=0.1,  # Dropout rate
     target_modules=["q_proj", "k_proj", "v_proj", "o_proj"],  # Target attention layers
     bias="none",  # No bias terms
     task_type="CAUSAL_LM"  # Task type
