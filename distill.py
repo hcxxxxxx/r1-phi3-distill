@@ -4,6 +4,10 @@ import os
 os.environ["NCCL_P2P_DISABLE"] = "1"
 os.environ["NCCL_IB_DISABLE"] = "1"
 
+os.environ["HF_HOME"] = "./Hcx"
+os.environ["TRANSFORMERS_CACHE"] = "./Hcx"
+os.environ["HF_DATASETS_CACHE"] = "./Hcx"
+
 from datasets import load_dataset
 # Load the dataset
 dataset = load_dataset("Magpie-Align/Magpie-Reasoning-V2-250K-CoT-Deepseek-R1-Llama-70B", split="train", token="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", cache_dir="./Hcx")
@@ -84,6 +88,8 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 model.resize_token_embeddings(len(tokenizer))  # Resize for custom tokens
 
+import bitsandbytes
+from bitsandbytes import research, utils
 from peft import LoraConfig
 
 peft_config = LoraConfig(
@@ -152,7 +158,8 @@ trainer = SFTTrainer(
     dataset_text_field="query",
     # optimizers=(optimizer, lr_scheduler),
     data_collator=data_collator,
-    max_seq_length=2048
+    max_seq_length=2048,
+    peft_config=peft_config
     )
 
 # Start training
