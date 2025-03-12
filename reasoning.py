@@ -4,7 +4,7 @@ import torch
 model = AutoModelForCausalLM.from_pretrained(
     "./phi-3-deepseek-finetuned",
     device_map="auto",
-    torch_dtype=torch.float16
+    torch_dtype=torch.bfloat16
 )
 
 tokenizer = AutoTokenizer.from_pretrained("./phi-3-deepseek-finetuned")
@@ -20,7 +20,7 @@ chat_pipeline = pipeline(
 
 # Generate response
 prompt = """<|user|>
-List all the subsets of {1, 2, 3}
+which one is bigger, 9.11 or 9.9
 <|end|>
 <|assistant|>
 """

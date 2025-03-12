@@ -16,7 +16,7 @@ train_ds = split_dataset["train"]
 test_ds = split_dataset["test"]
 
 # training scale on the dataset
-scale = 0.03
+scale = 1
 train_ds = train_ds.select(range(int(len(train_ds) * scale)))
 test_ds = test_ds.select(range(int(len(test_ds) * scale)))
 
