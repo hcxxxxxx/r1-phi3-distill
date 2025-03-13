@@ -2,7 +2,7 @@ import json
 import matplotlib.pyplot as plt
 import os
 
-trainer_state_path = "./phi-3-deepseek-finetuned/checkpoint-7029/trainer_state.json"
+trainer_state_path = "./phi-3-deepseek-finetuned/checkpoint-490/trainer_state.json"
 
 with open(trainer_state_path, "r") as f:
     trainer_state = json.load(f)
