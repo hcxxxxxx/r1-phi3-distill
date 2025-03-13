@@ -21,7 +21,7 @@ for entry in log_history:
         learning_rates.append(entry.get("learning_rate", None))
         grad_norms.append(entry.get("grad_norm", None))
 
-log_dir = "./logs/log5"
+log_dir = "./logs/log_temp"
 os.makedirs(log_dir, exist_ok=True)
 
 line_width = 1

@@ -20,7 +20,7 @@ train_ds = split_dataset["train"]
 test_ds = split_dataset["test"]
 
 # training scale on the dataset
-scale = 1
+scale = 0.01
 train_ds = train_ds.select(range(int(len(train_ds) * scale)))
 test_ds = test_ds.select(range(int(len(test_ds) * scale)))
 
@@ -105,7 +105,7 @@ from transformers import TrainingArguments
 
 training_args = TrainingArguments(
     output_dir="./phi-3-deepseek-finetuned",
-    num_train_epochs=1,
+    num_train_epochs=7,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     gradient_accumulation_steps=4,
