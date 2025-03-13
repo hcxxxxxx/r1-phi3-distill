@@ -61,23 +61,23 @@ After training, the script prints dataset sizes and saves:
 The results are visualized as `.png` files in the `/logs` directory (with different configurations saved in `config.txt`) and shown below:
 
 <p align="center">
-<img src="./logs/log1/loss_curve.png" alt="loss_curve" width="300">
-<img src="./logs/log1/grad_norm_curve.png" alt="grad_norm_curve" width="300">
-<img src="./logs/log1/learning_rate_curve.png" alt="learning_rate_curve" width="300">
+<img src="./logs/log1/loss_curve.png" alt="loss_curve" width="250">
+<img src="./logs/log1/grad_norm_curve.png" alt="grad_norm_curve" width="250">
+<img src="./logs/log1/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
 <p align="center"><em>LoRA not used, lr_scheduler_type="linear"</em></p>
 
 <p align="center">
-<img src="./logs/log2/loss_curve.png" alt="loss_curve" width="300">
-<img src="./logs/log2/grad_norm_curve.png" alt="grad_norm_curve" width="300">
-<img src="./logs/log2/learning_rate_curve.png" alt="learning_rate_curve" width="300">
+<img src="./logs/log2/loss_curve.png" alt="loss_curve" width="250">
+<img src="./logs/log2/grad_norm_curve.png" alt="grad_norm_curve" width="250">
+<img src="./logs/log2/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
 <p align="center"><em>LoRA(r=8, lora_alpha=16, lora_dropout=0.2), lr_scheduler_type="linear"</em></p>
 
 <p align="center">
-<img src="./logs/log3/loss_curve.png" alt="loss_curve" width="300">
-<img src="./logs/log3/grad_norm_curve.png" alt="grad_norm_curve" width="300">
-<img src="./logs/log3/learning_rate_curve.png" alt="learning_rate_curve" width="300">
+<img src="./logs/log3/loss_curve.png" alt="loss_curve" width="250">
+<img src="./logs/log3/grad_norm_curve.png" alt="grad_norm_curve" width="250">
+<img src="./logs/log3/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
 <p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="linear"</em></p>
 
