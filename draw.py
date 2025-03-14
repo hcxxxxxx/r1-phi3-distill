@@ -2,7 +2,7 @@ import json
 import matplotlib.pyplot as plt
 import os
 
-trainer_state_path = "./phi-3-deepseek-finetuned/checkpoint-490/trainer_state.json"
+trainer_state_path = "./phi-3-deepseek-finetuned/checkpoint-14058/trainer_state.json"
 
 with open(trainer_state_path, "r") as f:
     trainer_state = json.load(f)
@@ -21,7 +21,7 @@ for entry in log_history:
         learning_rates.append(entry.get("learning_rate", None))
         grad_norms.append(entry.get("grad_norm", None))
 
-log_dir = "./logs/log_temp"
+log_dir = "./logs/log_tmp"
 os.makedirs(log_dir, exist_ok=True)
 
 line_width = 1

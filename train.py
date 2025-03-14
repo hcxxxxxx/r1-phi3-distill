@@ -20,7 +20,7 @@ train_ds = split_dataset["train"]
 test_ds = split_dataset["test"]
 
 # training scale on the dataset
-scale = 0.01
+scale = 1
 train_ds = train_ds.select(range(int(len(train_ds) * scale)))
 test_ds = test_ds.select(range(int(len(test_ds) * scale)))
 
@@ -105,14 +105,14 @@ from transformers import TrainingArguments
 
 training_args = TrainingArguments(
     output_dir="./phi-3-deepseek-finetuned",
-    num_train_epochs=7,
+    num_train_epochs=3,
     per_device_train_batch_size=8,
     per_device_eval_batch_size=8,
     gradient_accumulation_steps=4,
     eval_strategy="epoch",
     save_strategy="epoch",
     logging_strategy="steps",
-    logging_steps=50,
+    logging_steps=150,
     learning_rate=1e-4,
 #    fp16=True,
 #    fp16=False,
@@ -122,6 +122,7 @@ training_args = TrainingArguments(
     max_grad_norm=0.3,
     warmup_ratio=0.1,
     lr_scheduler_type="cosine_with_restarts",
+    lr_scheduler_kwargs={"num_cycles": 3}
 )
 
 # num_training_steps = (len(train_dataset) // 32) * 3
