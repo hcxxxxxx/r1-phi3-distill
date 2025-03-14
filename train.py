@@ -121,8 +121,8 @@ training_args = TrainingArguments(
     optim="adamw_torch",
     max_grad_norm=0.3,
     warmup_ratio=0.1,
-    lr_scheduler_type="cosine_with_restarts",
-    lr_scheduler_kwargs={"num_cycles": 3}
+    lr_scheduler_type="cosine",
+#    lr_scheduler_kwargs={"num_cycles": 3}
 )
 
 # num_training_steps = (len(train_dataset) // 32) * 3
