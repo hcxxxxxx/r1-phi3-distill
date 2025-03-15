@@ -65,42 +65,42 @@ The results are visualized as `.png` files in the `/logs` directory (with differ
 <img src="./logs/log1/grad_norm_curve.png" alt="grad_norm_curve" width="250">
 <img src="./logs/log1/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
-<p align="center"><em>LoRA not used, lr_scheduler_type="linear, epoch=1"</em></p>
+<p align="center"><em>LoRA not used, lr_scheduler_type="linear", epoch=1</em></p>
 
 <p align="center">
 <img src="./logs/log2/loss_curve.png" alt="loss_curve" width="250">
 <img src="./logs/log2/grad_norm_curve.png" alt="grad_norm_curve" width="250">
 <img src="./logs/log2/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
-<p align="center"><em>LoRA(r=8, lora_alpha=16, lora_dropout=0.2), lr_scheduler_type="linear, epoch=1"</em></p>
+<p align="center"><em>LoRA(r=8, lora_alpha=16, lora_dropout=0.2), lr_scheduler_type="linear", epoch=1</em></p>
 
 <p align="center">
 <img src="./logs/log3/loss_curve.png" alt="loss_curve" width="250">
 <img src="./logs/log3/grad_norm_curve.png" alt="grad_norm_curve" width="250">
 <img src="./logs/log3/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
-<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="linear, epoch=1"</em></p>
+<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="linear", epoch=1</em></p>
 
 <p align="center">
 <img src="./logs/log4/loss_curve.png" alt="loss_curve" width="250">
 <img src="./logs/log4/grad_norm_curve.png" alt="grad_norm_curve" width="250">
 <img src="./logs/log4/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
-<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="cosine, epoch=1"</em></p>
+<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="cosine", epoch=1</em></p>
 
 <p align="center">
 <img src="./logs/log5/loss_curve.png" alt="loss_curve" width="250">
 <img src="./logs/log5/grad_norm_curve.png" alt="grad_norm_curve" width="250">
 <img src="./logs/log5/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
-<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="cosine_with_restarts, epoch=1"</em></p>
+<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="cosine_with_restarts", epoch=1</em></p>
 
 <p align="center">
 <img src="./logs/log6/loss_curve.png" alt="loss_curve" width="250">
 <img src="./logs/log6/grad_norm_curve.png" alt="grad_norm_curve" width="250">
 <img src="./logs/log6/learning_rate_curve.png" alt="learning_rate_curve" width="250">
 </p>
-<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="cosine_with_restarts, epoch=3"</em></p>
+<p align="center"><em>LoRA(r=4, lora_alpha=8, lora_dropout=0.1), lr_scheduler_type="cosine_with_restarts", epoch=3</em></p>
 
 ## Notes
 - `NCCL_P2P_DISABLE=1` and `NCCL_IB_DISABLE=1` are set to avoid potential issues with distributed training.
